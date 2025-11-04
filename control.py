@@ -12,7 +12,7 @@ def validar_carnet(carnet):
         raise ValueError("Carnet inválido. Ejemplo: 25-02395-0")
     return carnet
 
-def validar_estado_civil(estado):
+def validar_estado_civil(estado):  
     opciones = ["soltero", "casado", "divorciado", "viudo"]
     if estado.lower() not in opciones:
         raise ValueError("Estado civil inválido. Opciones: Soltero, Casado, Divorciado, Viudo.")
@@ -113,10 +113,10 @@ def registrar_estudiante(estudiantes):
         })
 
         guardar_estudiantes(estudiantes)
-        print(f"\n✅ Estudiante '{nombre}' registrado correctamente.\n")
+        print(f"\n  Estudiante '{nombre}' registrado correctamente.\n")
 
     except ValueError as e:
-        print(f"\n⚠️ Error: {e}\n")
+        print(f"\n  Error: {e}\n")
 
 def mostrar_mis_datos(estudiantes):
     carnet = input("\nIngrese su carnet para ver sus datos: ")
@@ -150,7 +150,7 @@ def mostrar_mis_datos(estudiantes):
     print("\nNo se encontró el estudiante.\n")
 
 def calcular_promedio_personal(estudiantes):
-    carnet = input("\nIngrese su carnet: ")
+    carnet = input("\nIngrese el carnet: ")
     for est in estudiantes:
         if est["carnet"] == carnet:
             if not est["notas"]:
@@ -158,7 +158,7 @@ def calcular_promedio_personal(estudiantes):
                 return
             promedio = sum(n["nota"] for n in est["notas"]) / len(est["notas"])
             print(f"\nPromedio de {est['nombre']}: {promedio:.2f}")
-            estado = "Aprobado ✅" if promedio >= 60 else "Reprobado ❌"
+            estado = "Aprobado  " if promedio >= 60 else "Reprobado "
             print(f"Estado general: {estado}\n")
             return
     print("\nNo se encontró el estudiante.\n")
@@ -194,7 +194,7 @@ def actualizar_estudiante(estudiantes):
                     nota = validar_nota(input(f"Nota de {materia}: "))
                     est['notas'].append({"materia": materia, "nota": nota})
             guardar_estudiantes(estudiantes)
-            print("\n✅ Datos actualizados correctamente.\n")
+            print("\n  Datos actualizados correctamente.\n")
             return
     print("\nNo se encontró el estudiante.\n")
 
@@ -206,9 +206,25 @@ def eliminar_estudiante(estudiantes):
             if confirm == "S":
                 estudiantes.pop(i)
                 guardar_estudiantes(estudiantes)
-                print("\n✅ Estudiante eliminado correctamente.\n")
+                print("\n  Estudiante eliminado correctamente.\n")
             return
     print("\nNo se encontró el estudiante.\n")
+
+# ---------- FUNCIONES DE PILA / CONFIRMACIÓN ----------
+
+def confirmar_accion(accion):
+    pila = []
+    while True:
+        confirm = input(f"¿Está seguro que desea {accion}? (S/N): ").upper()
+        if confirm == "S":
+            pila.append(True)   # Guardamos confirmación en la pila
+            return True
+        elif confirm == "N":
+            pila.append(False)
+            print("Acción cancelada.\n")
+            return False
+        else:
+            print("Ingrese S para sí o N para no.")
 
 # ---------- MENÚS ----------
 
@@ -216,17 +232,16 @@ def menu_estudiante(estudiantes):
     while True:
         print("\n=== MENÚ ESTUDIANTE ===")
         print("1. Registrar mis datos y notas")
-        print("2. Visualizar mis datos y notas")  # Nueva opción
-        print("3. Calcular mi promedio y ver si aprobé")
-        print("4. Salir")
+        print("2. Visualizar mis datos y notas")
+        print("3. Salir")
         opcion = input("Seleccione una opción: ")
         if opcion == "1":
-            registrar_estudiante(estudiantes)
+            if confirmar_accion("registrar sus datos"):
+                registrar_estudiante(estudiantes)
         elif opcion == "2":
-            mostrar_mis_datos(estudiantes)
+            if confirmar_accion("ver sus datos"):
+                mostrar_mis_datos(estudiantes)
         elif opcion == "3":
-            calcular_promedio_personal(estudiantes)
-        elif opcion == "4":
             break
         else:
             print("Opción inválida.\n")
@@ -237,15 +252,23 @@ def menu_profesor(estudiantes):
         print("1. Ver lista de estudiantes")
         print("2. Actualizar datos de un estudiante")
         print("3. Eliminar estudiante")
-        print("4. Salir")
+        print("4. Calcular promedio de un estudiante")
+        print("5. Salir")
         opcion = input("Seleccione una opción: ")
+
         if opcion == "1":
-            mostrar_todos(estudiantes)
+            if confirmar_accion("ver la lista de estudiantes"):
+                mostrar_todos(estudiantes)
         elif opcion == "2":
-            actualizar_estudiante(estudiantes)
+            if confirmar_accion("actualizar datos de un estudiante"):
+                actualizar_estudiante(estudiantes)
         elif opcion == "3":
-            eliminar_estudiante(estudiantes)
+            if confirmar_accion("eliminar un estudiante"):
+                eliminar_estudiante(estudiantes)
         elif opcion == "4":
+            if confirmar_accion("calcular promedio de un estudiante"):
+                calcular_promedio_personal(estudiantes)
+        elif opcion == "5":
             break
         else:
             print("Opción inválida.\n")
